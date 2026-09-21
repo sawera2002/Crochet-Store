@@ -1,0 +1,6 @@
+{
+  "name": "Zarsal - Handmade Crochet & Quraishia Studio",
+  "description": "Zarsal handcrafted crochet boutique in Karachi featuring artisan bags, daisy bucket hats, flower bracelets, keychains, and lace handkerchiefs with EasyPaisa, Cash on Delivery in Karachi, and WhatsApp ordering.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
