@@ -77,11 +77,11 @@ const DEFAULT_SETTINGS: StoreSettings = {
   storeName: 'Zarsal',
   tagline: 'Handmade Crochet Art | Karachi Studio',
   easyPaisaAccountTitle: 'Zarsal Studio (Sawera C.)',
-  easyPaisaAccountNumber: '0304-7891234',
+  easyPaisaAccountNumber: '0324336202',
   freeShippingThreshold: 2500,
   standardShippingFee: 180,
-  contactPhone: '+92 304 7891234',
-  whatsappNumber: '03047891234',
+  contactPhone: '+92 324 336202',
+  whatsappNumber: '0324336202',
   contactEmail: 'contact@zarsalcrochet.pk',
   cityServed: 'Karachi Only'
 };
@@ -132,7 +132,19 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [settings, setSettings] = useState<StoreSettings>(() => {
     try {
       const saved = localStorage.getItem('zarsal_settings');
-      if (saved) return { ...DEFAULT_SETTINGS, ...JSON.parse(saved) };
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed.whatsappNumber === '03047891234' || !parsed.whatsappNumber) {
+          parsed.whatsappNumber = '0324336202';
+        }
+        if (parsed.contactPhone === '+92 304 7891234' || !parsed.contactPhone) {
+          parsed.contactPhone = '+92 324 336202';
+        }
+        if (parsed.easyPaisaAccountNumber === '0304-7891234') {
+          parsed.easyPaisaAccountNumber = '0324336202';
+        }
+        return { ...DEFAULT_SETTINGS, ...parsed };
+      }
     } catch {
       // fallback
     }

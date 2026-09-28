@@ -74,11 +74,11 @@ export const AdminPanel: React.FC = () => {
 
   // Store Settings Form States
   const [epTitle, setEpTitle] = useState(settings.easyPaisaAccountTitle);
-  const [epNumber, setEpNumber] = useState(settings.easyPaisaAccountNumber);
+  const [epNumber, setEpNumber] = useState(settings.easyPaisaAccountNumber || '0324336202');
   const [freeThreshold, setFreeThreshold] = useState(settings.freeShippingThreshold);
   const [stdShipping, setStdShipping] = useState(settings.standardShippingFee);
-  const [waNumber, setWaNumber] = useState(settings.whatsappNumber || '03047891234');
-  const [phoneSupport, setPhoneSupport] = useState(settings.contactPhone || '+92 304 7891234');
+  const [waNumber, setWaNumber] = useState(settings.whatsappNumber || '0324336202');
+  const [phoneSupport, setPhoneSupport] = useState(settings.contactPhone || '+92 324 336202');
 
   // Filtered Orders
   const filteredOrders = useMemo(() => {

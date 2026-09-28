@@ -155,7 +155,12 @@ export const BLOG_POSTS: BlogPost[] = [
   }
 ];
 
-export const getWhatsAppUrl = (phone = '923047891234', message = 'Hello Zarsal! I would like to inquire about your handmade crochet pieces in Karachi.') => {
-  const cleanPhone = phone.replace(/[^0-9]/g, '');
+export const getWhatsAppUrl = (phone = '0324336202', message = 'Hello Zarsal! I would like to inquire about your handmade crochet pieces in Karachi.') => {
+  let cleanPhone = phone.replace(/[^0-9]/g, '');
+  if (cleanPhone.startsWith('0')) {
+    cleanPhone = '92' + cleanPhone.slice(1);
+  } else if (!cleanPhone.startsWith('92')) {
+    cleanPhone = '92' + cleanPhone;
+  }
   return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
 };
