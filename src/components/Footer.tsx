@@ -2,14 +2,14 @@ import React from 'react';
 import { useStore } from '../context/StoreContext';
 import { ProductCategory, NavigationTab } from '../types';
 import { getWhatsAppUrl } from '../data/contentData';
-import { Sparkles, Lock, PhoneCall, MapPin, MessageCircle, Heart } from 'lucide-react';
+import { PhoneCall, MapPin, MessageCircle, Heart } from 'lucide-react';
 
 interface FooterProps {
   onSelectCategory?: (cat: ProductCategory) => void;
 }
 
 export const Footer: React.FC<FooterProps> = ({ onSelectCategory }) => {
-  const { settings, isAdmin, setActiveTab } = useStore();
+  const { settings, setActiveTab } = useStore();
 
   const handleCategoryClick = (cat: ProductCategory) => {
     setActiveTab('shop');
@@ -120,7 +120,7 @@ export const Footer: React.FC<FooterProps> = ({ onSelectCategory }) => {
             </div>
           </div>
 
-          {/* Column 4: WhatsApp Helpline & Admin Link */}
+          {/* Column 4: WhatsApp Helpline */}
           <div className="space-y-2.5">
             <h4 className="font-serif font-bold text-sm text-[#012f3d] uppercase tracking-wider">
               Direct Contact
@@ -141,17 +141,6 @@ export const Footer: React.FC<FooterProps> = ({ onSelectCategory }) => {
                 <MapPin className="w-3.5 h-3.5 text-[#6ac8c1]" />
                 <span>Karachi, Sindh, Pakistan</span>
               </div>
-            </div>
-
-            <div className="pt-3 border-t border-[#6ac8c1]/20">
-              <button
-                onClick={() => handleNavClick('admin')}
-                className="inline-flex items-center gap-1.5 text-[#4a707a] hover:text-[#012f3d] transition cursor-pointer text-[11px]"
-                title="Go to /admin"
-              >
-                <Lock className="w-3.5 h-3.5" />
-                <span>{isAdmin ? 'Open Admin Control Studio' : 'Admin Portal (/admin)'}</span>
-              </button>
             </div>
           </div>
         </div>

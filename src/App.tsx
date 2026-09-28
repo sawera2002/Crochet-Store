@@ -40,13 +40,17 @@ const StoreContent: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const isCustomerPage = activeTab !== 'admin';
+
   return (
     <div className="min-h-screen bg-[#faf8f2] text-[#012f3d] flex flex-col font-sans selection:bg-[#6ac8c1]/30 selection:text-[#012f3d]">
-      {/* Complete Responsive Navbar with Home, About, Shop, Blogs, Contact */}
-      <Navbar
-        onOpenCart={() => setIsCartOpen(true)}
-        onNavigate={(tab: NavigationTab) => setActiveTab(tab)}
-      />
+      {/* Storefront Navbar (Rendered only on customer storefront pages, without admin lock icon) */}
+      {isCustomerPage && (
+        <Navbar
+          onOpenCart={() => setIsCartOpen(true)}
+          onNavigate={(tab: NavigationTab) => setActiveTab(tab)}
+        />
+      )}
 
       {/* Main Routed Page Content */}
       <main className="flex-1">
@@ -98,18 +102,20 @@ const StoreContent: React.FC = () => {
         directBuyItem={directBuyItem}
       />
 
-      {/* Persistent Floating WhatsApp Contact Button */}
-      <WhatsAppButton />
+      {/* Persistent Floating WhatsApp Contact Button (Customer pages only) */}
+      {isCustomerPage && <WhatsAppButton />}
 
       {/* Interactive System Toast Feedback */}
       <Toast />
 
-      {/* Site Footer with Crochet Art, Links, & Helpline */}
-      <Footer
-        onSelectCategory={(cat) => {
-          handleNavigateToShop(cat);
-        }}
-      />
+      {/* Site Footer (Customer pages only) */}
+      {isCustomerPage && (
+        <Footer
+          onSelectCategory={(cat) => {
+            handleNavigateToShop(cat);
+          }}
+        />
+      )}
     </div>
   );
 };

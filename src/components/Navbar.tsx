@@ -7,14 +7,11 @@ import {
   Sparkles,
   LayoutDashboard,
   LogOut,
-  Lock,
   Menu,
   X,
   MessageCircle,
-  MapPin,
-  Heart
+  MapPin
 } from 'lucide-react';
-import { AdminLoginModal } from './AdminLoginModal';
 
 interface NavbarProps {
   onOpenCart: () => void;
@@ -23,7 +20,6 @@ interface NavbarProps {
 
 export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onNavigate }) => {
   const { cartCount, isAdmin, logoutAdmin, activeTab, setActiveTab, orders, settings } = useStore();
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const pendingOrdersCount = orders.filter(
@@ -55,7 +51,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onNavigate }) => {
 
   return (
     <>
-      {/* Top Notification Announcement Bar (Soft Brand Colors, NO black) */}
+      {/* Top Notification Announcement Bar */}
       <div className="bg-[#012f3d] text-[#faf8f2] text-xs py-2 px-4 border-b border-[#6ac8c1]/25">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-1 text-center sm:text-left">
           <div className="flex items-center justify-center gap-2">
@@ -110,7 +106,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onNavigate }) => {
               </div>
             </div>
 
-            {/* Desktop Navigation Links (Home, About, Shop, Blogs, Contact) */}
+            {/* Desktop Navigation Links */}
             <nav className="hidden lg:flex items-center gap-1">
               {navLinks.map((link) => {
                 const isActive = activeTab === link.id;
@@ -158,8 +154,8 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onNavigate }) => {
                 </span>
               </button>
 
-              {/* Admin Access: Only Admin Views Admin Panel */}
-              {isAdmin ? (
+              {/* If owner is already logged in, show quick switcher */}
+              {isAdmin && (
                 <div className="flex items-center gap-1.5 pl-1 border-l border-[#6ac8c1]/30">
                   <button
                     onClick={() => handleNavClick(activeTab === 'admin' ? 'home' : 'admin')}
@@ -188,15 +184,6 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onNavigate }) => {
                     <LogOut className="w-4 h-4" />
                   </button>
                 </div>
-              ) : (
-                /* Discreet login access for owner, navigating directly to /admin */
-                <button
-                  onClick={() => handleNavClick('admin')}
-                  className="p-2 text-[#4a707a] hover:text-[#012f3d] hover:bg-white rounded-xl transition cursor-pointer"
-                  title="Owner / Admin Portal (/admin)"
-                >
-                  <Lock className="w-3.5 h-3.5" />
-                </button>
               )}
             </div>
           </div>
@@ -232,9 +219,6 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onNavigate }) => {
           )}
         </div>
       </header>
-
-      {/* Admin Login Modal */}
-      <AdminLoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
     </>
   );
 };
