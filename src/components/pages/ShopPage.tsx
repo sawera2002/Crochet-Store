@@ -227,21 +227,27 @@ export const ShopPage: React.FC<ShopPageProps> = ({
               🧶
             </div>
             <h3 className="font-serif text-2xl font-bold text-[#012f3d]">
-              No Matching Crochet Pieces Found
+              {products.length === 0
+                ? 'Handmade Catalog Coming Soon'
+                : 'No Matching Crochet Pieces Found'}
             </h3>
             <p className="text-[#2d5560] text-xs sm:text-sm max-w-md mx-auto">
-              We couldn't find items matching your search. Try changing the category tab or clear your filters.
+              {products.length === 0
+                ? 'Our Karachi studio creates items in small artisanal batches. Items added by the admin will appear here immediately.'
+                : "We couldn't find items matching your search. Try changing the category tab or reset your filters."}
             </p>
-            <button
-              onClick={() => {
-                setSelectedCategory('all');
-                setSearchQuery('');
-                setInStockOnly(false);
-              }}
-              className="px-6 py-2.5 bg-[#012f3d] hover:bg-[#024357] text-[#faf8f2] rounded-xl text-xs font-semibold transition cursor-pointer"
-            >
-              Show All Handmade Products
-            </button>
+            {products.length > 0 && (
+              <button
+                onClick={() => {
+                  setSelectedCategory('all');
+                  setSearchQuery('');
+                  setInStockOnly(false);
+                }}
+                className="px-6 py-2.5 bg-[#012f3d] hover:bg-[#024357] text-[#faf8f2] rounded-xl text-xs font-semibold transition cursor-pointer"
+              >
+                Show All Handmade Products
+              </button>
+            )}
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">

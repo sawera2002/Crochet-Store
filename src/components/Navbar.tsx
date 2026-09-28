@@ -189,11 +189,11 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onNavigate }) => {
                   </button>
                 </div>
               ) : (
-                /* Discreet login access for owner, keeping regular customers purely in website view */
+                /* Discreet login access for owner, navigating directly to /admin */
                 <button
-                  onClick={() => setIsLoginModalOpen(true)}
+                  onClick={() => handleNavClick('admin')}
                   className="p-2 text-[#4a707a] hover:text-[#012f3d] hover:bg-white rounded-xl transition cursor-pointer"
-                  title="Owner / Admin Login"
+                  title="Owner / Admin Portal (/admin)"
                 >
                   <Lock className="w-3.5 h-3.5" />
                 </button>

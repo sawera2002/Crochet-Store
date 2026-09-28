@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useStore } from '../context/StoreContext';
 import { ProductCategory, NavigationTab } from '../types';
 import { getWhatsAppUrl } from '../data/contentData';
-import { Sparkles, Lock, PhoneCall, Mail, MapPin, MessageCircle, Heart } from 'lucide-react';
-import { AdminLoginModal } from './AdminLoginModal';
+import { Sparkles, Lock, PhoneCall, MapPin, MessageCircle, Heart } from 'lucide-react';
 
 interface FooterProps {
   onSelectCategory?: (cat: ProductCategory) => void;
@@ -11,7 +10,6 @@ interface FooterProps {
 
 export const Footer: React.FC<FooterProps> = ({ onSelectCategory }) => {
   const { settings, isAdmin, setActiveTab } = useStore();
-  const [isAdminModalOpen, setIsAdminModalOpen] = useState(false);
 
   const handleCategoryClick = (cat: ProductCategory) => {
     setActiveTab('shop');
@@ -146,23 +144,14 @@ export const Footer: React.FC<FooterProps> = ({ onSelectCategory }) => {
             </div>
 
             <div className="pt-3 border-t border-[#6ac8c1]/20">
-              {isAdmin ? (
-                <button
-                  onClick={() => handleNavClick('admin')}
-                  className="inline-flex items-center gap-1.5 text-[#012f3d] font-bold hover:underline transition cursor-pointer"
-                >
-                  <Sparkles className="w-3.5 h-3.5 text-[#6ac8c1]" />
-                  <span>Open Zarsal Admin Studio</span>
-                </button>
-              ) : (
-                <button
-                  onClick={() => setIsAdminModalOpen(true)}
-                  className="inline-flex items-center gap-1.5 text-[#4a707a] hover:text-[#012f3d] transition cursor-pointer text-[11px]"
-                >
-                  <Lock className="w-3.5 h-3.5" />
-                  <span>Store Owner / Admin Login</span>
-                </button>
-              )}
+              <button
+                onClick={() => handleNavClick('admin')}
+                className="inline-flex items-center gap-1.5 text-[#4a707a] hover:text-[#012f3d] transition cursor-pointer text-[11px]"
+                title="Go to /admin"
+              >
+                <Lock className="w-3.5 h-3.5" />
+                <span>{isAdmin ? 'Open Admin Control Studio' : 'Admin Portal (/admin)'}</span>
+              </button>
             </div>
           </div>
         </div>
@@ -179,8 +168,6 @@ export const Footer: React.FC<FooterProps> = ({ onSelectCategory }) => {
           </div>
         </div>
       </div>
-
-      <AdminLoginModal isOpen={isAdminModalOpen} onClose={() => setIsAdminModalOpen(false)} />
     </footer>
   );
 };

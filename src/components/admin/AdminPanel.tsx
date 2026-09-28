@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useStore } from '../../context/StoreContext';
-import { Product, Order, OrderStatus, PaymentMethod } from '../../types';
+import { Product, Order, OrderStatus } from '../../types';
 import { getWhatsAppUrl } from '../../data/contentData';
 import {
   Package,
@@ -9,10 +9,6 @@ import {
   Trash2,
   Edit,
   Search,
-  CheckCircle2,
-  Clock,
-  Truck,
-  TrendingUp,
   CreditCard,
   Phone,
   Eye,
@@ -22,13 +18,18 @@ import {
   LogOut,
   MapPin,
   MessageCircle,
-  XCircle,
+  Database,
+  CheckCircle2,
+  AlertCircle,
+  RefreshCw,
   Copy,
-  Check
+  Check,
+  User,
+  KeyRound,
+  EyeOff
 } from 'lucide-react';
 import { ProductFormModal } from './ProductFormModal';
 import { OrderDetailModal } from './OrderDetailModal';
-import { AdminLoginModal } from '../AdminLoginModal';
 import { DeleteConfirmationModal, DeleteTarget } from './DeleteConfirmationModal';
 
 export const AdminPanel: React.FC = () => {
@@ -37,6 +38,11 @@ export const AdminPanel: React.FC = () => {
     orders,
     products,
     settings,
+    supabaseStatus,
+    refreshDbData,
+    supabaseSql,
+    seedSampleCatalog,
+    clearAllProducts,
     addProduct,
     updateProduct,
     deleteProduct,
@@ -47,14 +53,21 @@ export const AdminPanel: React.FC = () => {
     clearAllOrders,
     resetProductsToDefault,
     updateSettings,
+    loginAdmin,
     logoutAdmin,
-    setActiveTab
+    setActiveTab,
+    showToast
   } = useStore();
 
-  const [adminTab, setAdminTab] = useState<'orders' | 'products' | 'settings'>('orders');
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [adminTab, setAdminTab] = useState<'orders' | 'products' | 'database' | 'settings'>('orders');
 
-  // In-App Confirmation Modal state (Replaces blocked window.confirm)
+  // Login form state for dedicated /admin route
+  const [loginUsername, setLoginUsername] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [loginError, setLoginError] = useState('');
+
+  // In-App Confirmation Modal state
   const [deleteTarget, setDeleteTarget] = useState<DeleteTarget | null>(null);
 
   // Orders Management States & Selection
@@ -70,6 +83,8 @@ export const AdminPanel: React.FC = () => {
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
+  const [copiedSql, setCopiedSql] = useState(false);
+  const [isRefreshingDb, setIsRefreshingDb] = useState(false);
 
   // Store Settings Form States
   const [epTitle, setEpTitle] = useState(settings.easyPaisaAccountTitle);
@@ -118,31 +133,100 @@ export const AdminPanel: React.FC = () => {
   const pendingCount = orders.filter((o) => o.status === 'pending_payment').length;
   const craftingCount = orders.filter((o) => o.status === 'crafting' || o.status === 'confirmed').length;
 
+  // Dedicated Admin Login View (No passwords displayed anywhere!)
   if (!isAdmin) {
+    const handleLoginSubmit = (e: React.FormEvent) => {
+      e.preventDefault();
+      setLoginError('');
+      if (!loginUsername.trim()) {
+        setLoginError('Please enter username');
+        return;
+      }
+      if (!loginPassword) {
+        setLoginError('Please enter password');
+        return;
+      }
+      const success = loginAdmin(loginUsername, loginPassword);
+      if (!success) {
+        setLoginError('Invalid username or password');
+      }
+    };
+
     return (
-      <div className="min-h-[70vh] flex items-center justify-center p-6 bg-[#faf8f2]">
-        <div className="max-w-md w-full bg-white rounded-3xl p-8 border border-[#6ac8c1]/40 shadow-xl text-center space-y-4">
-          <div className="w-16 h-16 rounded-2xl bg-[#012f3d]/10 text-[#012f3d] flex items-center justify-center mx-auto border border-[#6ac8c1]/30">
-            <Lock className="w-8 h-8 text-[#012f3d]" />
+      <div className="min-h-[85vh] flex items-center justify-center p-4 sm:p-6 bg-[#faf8f2]">
+        <div className="max-w-md w-full bg-white rounded-3xl p-8 border border-[#6ac8c1]/40 shadow-xl space-y-6">
+          <div className="text-center space-y-2">
+            <div className="w-16 h-16 rounded-2xl bg-[#012f3d] text-[#faf8f2] flex items-center justify-center mx-auto border border-[#6ac8c1]/40 shadow-md">
+              <Lock className="w-8 h-8 text-[#6ac8c1]" />
+            </div>
+            <h2 className="font-serif text-3xl font-bold text-[#012f3d]">Zarsal Admin Studio</h2>
+            <p className="text-[#2d5560] text-xs sm:text-sm">
+              Restricted portal for managing crochet catalog, customer orders, Karachi addresses, and Supabase database.
+            </p>
           </div>
-          <h2 className="font-serif text-2xl font-bold text-[#012f3d]">Restricted Admin Portal</h2>
-          <p className="text-[#2d5560] text-xs sm:text-sm">
-            Only authorized administrators can access the checkout list, customer delivery addresses, and manage crochet products.
-          </p>
-          <button
-            onClick={() => setIsLoginModalOpen(true)}
-            className="w-full py-3 bg-[#012f3d] hover:bg-[#024357] text-[#faf8f2] rounded-xl font-semibold text-sm transition cursor-pointer shadow-md"
-          >
-            Enter Admin Passcode
-          </button>
-          <button
-            onClick={() => setActiveTab('home')}
-            className="text-xs text-[#2d5560] hover:text-[#012f3d] underline transition cursor-pointer"
-          >
-            Return to Zarsal Storefront
-          </button>
+
+          <form onSubmit={handleLoginSubmit} className="space-y-4">
+            <div>
+              <label className="block text-xs font-bold uppercase tracking-wider text-[#012f3d] mb-1.5">
+                Username
+              </label>
+              <div className="relative">
+                <User className="w-4 h-4 text-[#4a707a] absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  value={loginUsername}
+                  onChange={(e) => setLoginUsername(e.target.value)}
+                  placeholder="Enter admin username"
+                  autoComplete="username"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[#6ac8c1]/40 bg-[#faf8f2] text-[#012f3d] text-sm focus:outline-hidden focus:ring-2 focus:ring-[#6ac8c1]"
+                  autoFocus
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold uppercase tracking-wider text-[#012f3d] mb-1.5">
+                Password
+              </label>
+              <div className="relative">
+                <KeyRound className="w-4 h-4 text-[#4a707a] absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  value={loginPassword}
+                  onChange={(e) => setLoginPassword(e.target.value)}
+                  placeholder="Enter admin password"
+                  autoComplete="current-password"
+                  className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-[#6ac8c1]/40 bg-[#faf8f2] text-[#012f3d] text-sm focus:outline-hidden focus:ring-2 focus:ring-[#6ac8c1]"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#4a707a] hover:text-[#012f3d] p-1 cursor-pointer"
+                  title={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+              {loginError && <p className="text-rose-600 text-xs mt-1.5 font-medium">{loginError}</p>}
+            </div>
+
+            <button
+              type="submit"
+              className="w-full py-3 bg-[#012f3d] hover:bg-[#024357] text-[#faf8f2] rounded-xl font-semibold text-sm transition cursor-pointer shadow-md active:scale-98"
+            >
+              Sign In to Admin Panel
+            </button>
+          </form>
+
+          <div className="pt-2 text-center border-t border-[#6ac8c1]/20">
+            <button
+              onClick={() => setActiveTab('home')}
+              className="text-xs text-[#2d5560] hover:text-[#012f3d] underline transition cursor-pointer"
+            >
+              Return to Zarsal Storefront
+            </button>
+          </div>
         </div>
-        <AdminLoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
       </div>
     );
   }
@@ -157,11 +241,11 @@ export const AdminPanel: React.FC = () => {
     setIsProductModalOpen(true);
   };
 
-  const handleSaveProduct = (prodData: Omit<Product, 'id' | 'rating' | 'reviewsCount'>) => {
+  const handleSaveProduct = async (prodData: Omit<Product, 'id' | 'rating' | 'reviewsCount'>) => {
     if (editingProduct) {
-      updateProduct(editingProduct.id, prodData);
+      await updateProduct(editingProduct.id, prodData);
     } else {
-      addProduct(prodData);
+      await addProduct(prodData);
     }
   };
 
@@ -173,28 +257,28 @@ export const AdminPanel: React.FC = () => {
     setDeleteTarget({ type: 'order', order });
   };
 
-  const handleExecuteDelete = () => {
+  const handleExecuteDelete = async () => {
     if (!deleteTarget) return;
 
     switch (deleteTarget.type) {
       case 'product':
-        deleteProduct(deleteTarget.product.id);
+        await deleteProduct(deleteTarget.product.id);
         setSelectedProductIds((prev) => prev.filter((id) => id !== deleteTarget.product.id));
         break;
       case 'order':
-        deleteOrder(deleteTarget.order.id);
+        await deleteOrder(deleteTarget.order.id);
         setSelectedOrderIds((prev) => prev.filter((id) => id !== deleteTarget.order.id));
         break;
       case 'multiple-orders':
-        deleteMultipleOrders(deleteTarget.orderIds);
+        await deleteMultipleOrders(deleteTarget.orderIds);
         setSelectedOrderIds([]);
         break;
       case 'multiple-products':
-        deleteMultipleProducts(deleteTarget.productIds);
+        await deleteMultipleProducts(deleteTarget.productIds);
         setSelectedProductIds([]);
         break;
       case 'clear-orders':
-        clearAllOrders();
+        await clearAllOrders();
         setSelectedOrderIds([]);
         break;
       case 'reset-catalog':
@@ -206,7 +290,6 @@ export const AdminPanel: React.FC = () => {
     setDeleteTarget(null);
   };
 
-  // Order Multi-Select Handlers
   const allOrdersSelected =
     filteredOrders.length > 0 &&
     filteredOrders.every((o) => selectedOrderIds.includes(o.id));
@@ -225,7 +308,6 @@ export const AdminPanel: React.FC = () => {
     );
   };
 
-  // Product Multi-Select Handlers
   const allProductsSelected =
     filteredProducts.length > 0 &&
     filteredProducts.every((p) => selectedProductIds.includes(p.id));
@@ -263,6 +345,20 @@ export const AdminPanel: React.FC = () => {
     window.open(url, '_blank', 'noopener,noreferrer');
   };
 
+  const handleCopySql = () => {
+    navigator.clipboard.writeText(supabaseSql);
+    setCopiedSql(true);
+    showToast('Supabase SQL schema copied to clipboard!');
+    setTimeout(() => setCopiedSql(false), 3000);
+  };
+
+  const handleRefreshDb = async () => {
+    setIsRefreshingDb(true);
+    await refreshDbData();
+    setIsRefreshingDb(false);
+    showToast('Database connection checked');
+  };
+
   const getStatusBadge = (status: OrderStatus) => {
     switch (status) {
       case 'pending_payment':
@@ -294,7 +390,7 @@ export const AdminPanel: React.FC = () => {
               Orders &amp; Crochet Inventory Manager
             </h1>
             <p className="text-[#faf8f2]/80 text-xs sm:text-sm mt-1 max-w-xl">
-              View customer delivery addresses in Karachi, verify EasyPaisa payments, dispatch riders, and publish new collection pieces.
+              Connected to Supabase database. Manage catalog, customer delivery addresses in Karachi, verify EasyPaisa payments, and dispatch riders.
             </p>
           </div>
 
@@ -312,6 +408,53 @@ export const AdminPanel: React.FC = () => {
             >
               <LogOut className="w-4 h-4" />
               <span>Logout</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Database Status Strip */}
+        <div className="bg-white rounded-2xl p-4 border border-[#6ac8c1]/30 shadow-2xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-xl bg-[#012f3d]/10 flex items-center justify-center text-[#012f3d] shrink-0">
+              <Database className="w-4 h-4 text-[#6ac8c1]" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2 font-bold text-[#012f3d]">
+                <span>Supabase: ogfapocufuxzrvpckpfc</span>
+                {supabaseStatus.connected ? (
+                  <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold text-[10px] flex items-center gap-1">
+                    <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                    Connected
+                  </span>
+                ) : (
+                  <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 font-bold text-[10px] flex items-center gap-1">
+                    <AlertCircle className="w-3 h-3 text-amber-600" />
+                    Pending Setup
+                  </span>
+                )}
+              </div>
+              <span className="text-[#2d5560] text-[11px]">
+                {supabaseStatus.productsTableExists && supabaseStatus.ordersTableExists
+                  ? 'Live database sync active for catalog and orders.'
+                  : 'Ready to connect tables. Use the "Supabase Database" tab to view setup SQL.'}
+              </span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setAdminTab('database')}
+              className="px-3 py-1.5 bg-[#faf8f2] hover:bg-[#6ac8c1]/20 text-[#012f3d] border border-[#6ac8c1]/30 rounded-xl text-xs font-semibold transition cursor-pointer"
+            >
+              Database Details
+            </button>
+            <button
+              onClick={handleRefreshDb}
+              disabled={isRefreshingDb}
+              className="p-1.5 text-[#012f3d] hover:bg-[#faf8f2] border border-[#6ac8c1]/30 rounded-xl transition cursor-pointer disabled:opacity-50"
+              title="Refresh database status"
+            >
+              <RefreshCw className={`w-4 h-4 ${isRefreshingDb ? 'animate-spin' : ''}`} />
             </button>
           </div>
         </div>
@@ -354,10 +497,10 @@ export const AdminPanel: React.FC = () => {
         </div>
 
         {/* Navigation Sub-Tabs */}
-        <div className="flex border-b border-[#6ac8c1]/30 gap-6">
+        <div className="flex border-b border-[#6ac8c1]/30 gap-6 overflow-x-auto scrollbar-none">
           <button
             onClick={() => setAdminTab('orders')}
-            className={`pb-3 text-sm font-serif font-bold transition-all relative cursor-pointer ${
+            className={`pb-3 text-sm font-serif font-bold transition-all relative cursor-pointer whitespace-nowrap ${
               adminTab === 'orders'
                 ? 'text-[#012f3d] border-b-2 border-[#012f3d]'
                 : 'text-[#4a707a] hover:text-[#012f3d]'
@@ -373,7 +516,7 @@ export const AdminPanel: React.FC = () => {
 
           <button
             onClick={() => setAdminTab('products')}
-            className={`pb-3 text-sm font-serif font-bold transition-all relative cursor-pointer ${
+            className={`pb-3 text-sm font-serif font-bold transition-all relative cursor-pointer whitespace-nowrap ${
               adminTab === 'products'
                 ? 'text-[#012f3d] border-b-2 border-[#012f3d]'
                 : 'text-[#4a707a] hover:text-[#012f3d]'
@@ -383,8 +526,20 @@ export const AdminPanel: React.FC = () => {
           </button>
 
           <button
+            onClick={() => setAdminTab('database')}
+            className={`pb-3 text-sm font-serif font-bold transition-all relative cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
+              adminTab === 'database'
+                ? 'text-[#012f3d] border-b-2 border-[#012f3d]'
+                : 'text-[#4a707a] hover:text-[#012f3d]'
+            }`}
+          >
+            <Database className="w-3.5 h-3.5 text-[#6ac8c1]" />
+            <span>Supabase Database</span>
+          </button>
+
+          <button
             onClick={() => setAdminTab('settings')}
-            className={`pb-3 text-sm font-serif font-bold transition-all relative cursor-pointer ${
+            className={`pb-3 text-sm font-serif font-bold transition-all relative cursor-pointer whitespace-nowrap ${
               adminTab === 'settings'
                 ? 'text-[#012f3d] border-b-2 border-[#012f3d]'
                 : 'text-[#4a707a] hover:text-[#012f3d]'
@@ -484,9 +639,9 @@ export const AdminPanel: React.FC = () => {
             {filteredOrders.length === 0 ? (
               <div className="bg-white p-12 text-center rounded-2xl border border-[#6ac8c1]/30 text-[#4a707a] space-y-2">
                 <Package className="w-12 h-12 mx-auto text-[#6ac8c1]" />
-                <h4 className="font-serif text-lg font-bold text-[#012f3d]">No Orders Found</h4>
+                <h4 className="font-serif text-lg font-bold text-[#012f3d]">No Customer Orders Yet</h4>
                 <p className="text-xs text-[#2d5560]">
-                  Try clearing search or filter terms to see customer orders.
+                  When customers place orders on your website via Cash on Delivery or EasyPaisa, their orders, Karachi addresses, and contact numbers will appear here.
                 </p>
               </div>
             ) : (
@@ -524,7 +679,6 @@ export const AdminPanel: React.FC = () => {
                               : 'hover:bg-[#faf8f2]/60'
                           }`}
                         >
-                          {/* Checkbox Column */}
                           <td className="py-3.5 px-3 text-center align-top">
                             <input
                               type="checkbox"
@@ -533,7 +687,6 @@ export const AdminPanel: React.FC = () => {
                               className="w-4 h-4 rounded text-[#012f3d] accent-[#012f3d] cursor-pointer"
                             />
                           </td>
-                          {/* Order ID & Date */}
                           <td className="py-3.5 px-4 align-top">
                             <span className="font-mono font-bold text-[#012f3d] block text-xs">
                               {order.id}
@@ -547,7 +700,6 @@ export const AdminPanel: React.FC = () => {
                             </span>
                           </td>
 
-                          {/* Customer Name & WhatsApp Contact */}
                           <td className="py-3.5 px-4 align-top">
                             <strong className="text-[#012f3d] block text-xs">
                               {order.customer.fullName}
@@ -566,7 +718,6 @@ export const AdminPanel: React.FC = () => {
                             </button>
                           </td>
 
-                          {/* Customer Delivery Address (Requested: order kew address bh show ho) */}
                           <td className="py-3.5 px-4 align-top">
                             <div className="space-y-1">
                               <div className="flex items-start gap-1 text-xs font-semibold text-[#012f3d]">
@@ -591,7 +742,6 @@ export const AdminPanel: React.FC = () => {
                             </div>
                           </td>
 
-                          {/* Items Preview */}
                           <td className="py-3.5 px-4 align-top">
                             <div className="flex items-center gap-1.5 mb-1">
                               {order.items.slice(0, 3).map((item) => (
@@ -614,7 +764,6 @@ export const AdminPanel: React.FC = () => {
                             </span>
                           </td>
 
-                          {/* Payment & TRX */}
                           <td className="py-3.5 px-4 align-top">
                             <div className="flex items-center gap-1.5 mb-0.5">
                               <span
@@ -634,12 +783,10 @@ export const AdminPanel: React.FC = () => {
                             )}
                           </td>
 
-                          {/* Total */}
                           <td className="py-3.5 px-4 align-top font-bold text-[#012f3d] font-sans text-xs sm:text-sm">
                             Rs. {order.total.toLocaleString()}
                           </td>
 
-                          {/* Status and Quick Status Switcher */}
                           <td className="py-3.5 px-4 align-top">
                             <div className="flex flex-col gap-1 items-start">
                               {getStatusBadge(order.status)}
@@ -660,7 +807,6 @@ export const AdminPanel: React.FC = () => {
                             </div>
                           </td>
 
-                          {/* Actions */}
                           <td className="py-3.5 px-4 align-top text-right">
                             <div className="flex items-center justify-end gap-1.5">
                               <button
@@ -762,84 +908,256 @@ export const AdminPanel: React.FC = () => {
               </div>
             )}
 
-            {/* Product Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {filteredProducts.map((prod) => (
-                <div
-                  key={prod.id}
-                  className={`bg-white rounded-2xl border p-3.5 shadow-2xs hover:shadow-md transition flex flex-col justify-between relative ${
-                    selectedProductIds.includes(prod.id)
-                      ? 'border-rose-300 ring-2 ring-rose-200 bg-rose-50/20'
-                      : 'border-[#6ac8c1]/30'
-                  }`}
-                >
-                  <div>
-                    <div className="relative aspect-video sm:aspect-square rounded-xl overflow-hidden bg-[#faf8f2] mb-3">
-                      <img
-                        src={prod.image}
-                        alt={prod.name}
-                        className="w-full h-full object-cover"
-                      />
-                      {/* Checkbox for multi-selection */}
-                      <div className="absolute top-2 left-2 z-10">
-                        <input
-                          type="checkbox"
-                          checked={selectedProductIds.includes(prod.id)}
-                          onChange={() => toggleSelectProduct(prod.id)}
-                          className="w-4 h-4 rounded text-[#012f3d] accent-[#012f3d] cursor-pointer bg-white shadow-xs"
-                          title="Select product"
+            {/* Empty State or Product Grid */}
+            {filteredProducts.length === 0 ? (
+              <div className="bg-white p-12 text-center rounded-3xl border border-dashed border-[#6ac8c1]/40 text-[#4a707a] space-y-4">
+                <div className="w-16 h-16 rounded-full bg-[#faf8f2] border border-[#6ac8c1]/30 flex items-center justify-center text-3xl mx-auto shadow-2xs">
+                  🧶
+                </div>
+                <h4 className="font-serif text-xl font-bold text-[#012f3d]">
+                  Catalog Is Currently Empty
+                </h4>
+                <p className="text-xs text-[#2d5560] max-w-md mx-auto">
+                  Only the items added by the admin will appear here and on the customer storefront. Click below to add your first handcrafted crochet product.
+                </p>
+                <div className="flex items-center justify-center gap-3 pt-2">
+                  <button
+                    onClick={handleOpenAddProduct}
+                    className="px-5 py-2.5 bg-[#012f3d] hover:bg-[#024357] text-[#faf8f2] rounded-xl text-xs font-semibold flex items-center gap-2 shadow-sm transition cursor-pointer"
+                  >
+                    <Plus className="w-4 h-4 text-[#6ac8c1]" />
+                    <span>Add First Product</span>
+                  </button>
+                  <button
+                    onClick={() => seedSampleCatalog()}
+                    className="px-4 py-2.5 bg-white border border-[#6ac8c1]/40 hover:bg-[#faf8f2] text-[#012f3d] rounded-xl text-xs font-semibold transition cursor-pointer"
+                  >
+                    Load Sample Catalog Items
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {filteredProducts.map((prod) => (
+                  <div
+                    key={prod.id}
+                    className={`bg-white rounded-2xl border p-3.5 shadow-2xs hover:shadow-md transition flex flex-col justify-between relative ${
+                      selectedProductIds.includes(prod.id)
+                        ? 'border-rose-300 ring-2 ring-rose-200 bg-rose-50/20'
+                        : 'border-[#6ac8c1]/30'
+                    }`}
+                  >
+                    <div>
+                      <div className="relative aspect-video sm:aspect-square rounded-xl overflow-hidden bg-[#faf8f2] mb-3">
+                        <img
+                          src={prod.image}
+                          alt={prod.name}
+                          className="w-full h-full object-cover"
                         />
-                      </div>
-                      <span className="absolute top-2 left-8 px-2 py-0.5 rounded-md bg-white/95 text-[10px] font-bold text-[#012f3d] uppercase shadow-2xs border border-[#6ac8c1]/30">
-                        {prod.category}
-                      </span>
-                      {prod.isNewCollection && (
-                        <span className="absolute top-2 right-2 px-2 py-0.5 rounded-md bg-[#6ac8c1] text-[10px] font-bold text-[#012f3d] shadow-2xs">
-                          In Carousel
+                        <div className="absolute top-2 left-2 z-10">
+                          <input
+                            type="checkbox"
+                            checked={selectedProductIds.includes(prod.id)}
+                            onChange={() => toggleSelectProduct(prod.id)}
+                            className="w-4 h-4 rounded text-[#012f3d] accent-[#012f3d] cursor-pointer bg-white shadow-xs"
+                            title="Select product"
+                          />
+                        </div>
+                        <span className="absolute top-2 left-8 px-2 py-0.5 rounded-md bg-white/95 text-[10px] font-bold text-[#012f3d] uppercase shadow-2xs border border-[#6ac8c1]/30">
+                          {prod.category}
                         </span>
-                      )}
+                        {prod.isNewCollection && (
+                          <span className="absolute top-2 right-2 px-2 py-0.5 rounded-md bg-[#6ac8c1] text-[10px] font-bold text-[#012f3d] shadow-2xs">
+                            In Carousel
+                          </span>
+                        )}
+                      </div>
+
+                      <h4 className="font-serif font-bold text-sm text-[#012f3d] line-clamp-1">
+                        {prod.name}
+                      </h4>
+                      <p className="text-[11px] text-[#4a707a] line-clamp-1 mt-0.5">
+                        {prod.yarnType}
+                      </p>
+
+                      <div className="flex items-center justify-between mt-2 pt-2 border-t border-[#f1ede1]">
+                        <span className="font-bold text-sm text-[#012f3d]">
+                          Rs. {prod.price.toLocaleString()}
+                        </span>
+                        <span className="text-xs text-[#2d5560]">
+                          Stock: <strong>{prod.stock}</strong>
+                        </span>
+                      </div>
                     </div>
 
-                    <h4 className="font-serif font-bold text-sm text-[#012f3d] line-clamp-1">
-                      {prod.name}
-                    </h4>
-                    <p className="text-[11px] text-[#4a707a] line-clamp-1 mt-0.5">
-                      {prod.yarnType}
-                    </p>
-
-                    <div className="flex items-center justify-between mt-2 pt-2 border-t border-[#f1ede1]">
-                      <span className="font-bold text-sm text-[#012f3d]">
-                        Rs. {prod.price.toLocaleString()}
-                      </span>
-                      <span className="text-xs text-[#2d5560]">
-                        Stock: <strong>{prod.stock}</strong>
-                      </span>
+                    <div className="flex items-center justify-end gap-2 pt-3 mt-2 border-t border-[#f1ede1]">
+                      <button
+                        onClick={() => handleOpenEditProduct(prod)}
+                        className="px-3 py-1.5 bg-[#faf8f2] hover:bg-[#6ac8c1]/20 text-[#012f3d] border border-[#6ac8c1]/30 rounded-xl text-xs font-semibold flex items-center gap-1 transition cursor-pointer"
+                      >
+                        <Edit className="w-3.5 h-3.5" />
+                        <span>Edit</span>
+                      </button>
+                      <button
+                        onClick={() => handleDeleteProductConfirm(prod)}
+                        className="p-1.5 text-rose-500 hover:text-white hover:bg-rose-600 border border-rose-200/80 rounded-xl transition cursor-pointer"
+                        title="Delete Product Permanently"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
                     </div>
                   </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
-                  <div className="flex items-center justify-end gap-2 pt-3 mt-2 border-t border-[#f1ede1]">
-                    <button
-                      onClick={() => handleOpenEditProduct(prod)}
-                      className="px-3 py-1.5 bg-[#faf8f2] hover:bg-[#6ac8c1]/20 text-[#012f3d] border border-[#6ac8c1]/30 rounded-xl text-xs font-semibold flex items-center gap-1 transition cursor-pointer"
-                    >
-                      <Edit className="w-3.5 h-3.5" />
-                      <span>Edit</span>
-                    </button>
-                    <button
-                      onClick={() => handleDeleteProductConfirm(prod)}
-                      className="p-1.5 text-rose-500 hover:text-white hover:bg-rose-600 border border-rose-200/80 rounded-xl transition cursor-pointer"
-                      title="Delete Product Permanently"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+        {/* TAB 3: SUPABASE DATABASE CONNECTION & SCHEMA */}
+        {adminTab === 'database' && (
+          <div className="space-y-6">
+            <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#6ac8c1]/30 shadow-sm space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-[#6ac8c1]/20">
+                <div>
+                  <span className="text-xs uppercase font-bold tracking-wider text-[#6ac8c1] block">
+                    PostgreSQL / Supabase Realtime Storage
+                  </span>
+                  <h3 className="font-serif text-2xl font-bold text-[#012f3d] mt-0.5">
+                    Supabase Project Connection
+                  </h3>
+                  <p className="text-xs text-[#2d5560] mt-1 max-w-xl">
+                    Live connection to your Supabase project. Products and customer orders persist permanently across sessions.
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={handleRefreshDb}
+                    disabled={isRefreshingDb}
+                    className="px-4 py-2 bg-[#faf8f2] hover:bg-[#6ac8c1]/20 text-[#012f3d] border border-[#6ac8c1]/30 rounded-xl text-xs font-bold flex items-center gap-2 transition cursor-pointer"
+                  >
+                    <RefreshCw className={`w-3.5 h-3.5 ${isRefreshingDb ? 'animate-spin' : ''}`} />
+                    <span>Check Connection</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Status Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="bg-[#faf8f2] p-4 rounded-2xl border border-[#6ac8c1]/30">
+                  <span className="text-[11px] font-bold text-[#4a707a] uppercase block">
+                    Supabase Project URL
+                  </span>
+                  <span className="text-xs font-mono font-bold text-[#012f3d] block mt-1 break-all">
+                    https://ogfapocufuxzrvpckpfc.supabase.co
+                  </span>
+                  <div className="flex items-center gap-1.5 mt-2 text-[11px] text-emerald-700 font-semibold">
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    <span>Endpoint Reachable</span>
                   </div>
                 </div>
-              ))}
+
+                <div className="bg-[#faf8f2] p-4 rounded-2xl border border-[#6ac8c1]/30">
+                  <span className="text-[11px] font-bold text-[#4a707a] uppercase block">
+                    Products Table (`public.products`)
+                  </span>
+                  <span className="text-sm font-bold text-[#012f3d] block mt-1">
+                    {supabaseStatus.productsTableExists ? (
+                      <span className="text-emerald-700 flex items-center gap-1">
+                        <CheckCircle2 className="w-4 h-4" /> Ready ({products.length} items)
+                      </span>
+                    ) : (
+                      <span className="text-amber-700 flex items-center gap-1">
+                        <AlertCircle className="w-4 h-4" /> Run SQL Setup Below
+                      </span>
+                    )}
+                  </span>
+                  <span className="text-[11px] text-[#4a707a] block mt-1">
+                    Stores name, prices, yarn, stock &amp; images.
+                  </span>
+                </div>
+
+                <div className="bg-[#faf8f2] p-4 rounded-2xl border border-[#6ac8c1]/30">
+                  <span className="text-[11px] font-bold text-[#4a707a] uppercase block">
+                    Orders Table (`public.orders`)
+                  </span>
+                  <span className="text-sm font-bold text-[#012f3d] block mt-1">
+                    {supabaseStatus.ordersTableExists ? (
+                      <span className="text-emerald-700 flex items-center gap-1">
+                        <CheckCircle2 className="w-4 h-4" /> Ready ({orders.length} orders)
+                      </span>
+                    ) : (
+                      <span className="text-amber-700 flex items-center gap-1">
+                        <AlertCircle className="w-4 h-4" /> Run SQL Setup Below
+                      </span>
+                    )}
+                  </span>
+                  <span className="text-[11px] text-[#4a707a] block mt-1">
+                    Stores customer addresses, items &amp; EasyPaisa TRX.
+                  </span>
+                </div>
+              </div>
+
+              {/* Instructions and SQL Box */}
+              <div className="space-y-3 pt-2">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="font-bold text-sm text-[#012f3d]">
+                      Supabase SQL Schema Script
+                    </h4>
+                    <p className="text-xs text-[#2d5560]">
+                      To initialize or verify tables in your Supabase project, copy this SQL and run it in the Supabase SQL Editor.
+                    </p>
+                  </div>
+                  <button
+                    onClick={handleCopySql}
+                    className="px-3.5 py-2 bg-[#012f3d] hover:bg-[#024357] text-[#faf8f2] rounded-xl text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer shadow-2xs"
+                  >
+                    {copiedSql ? <Check className="w-3.5 h-3.5 text-[#6ac8c1]" /> : <Copy className="w-3.5 h-3.5" />}
+                    <span>{copiedSql ? 'Copied!' : 'Copy SQL Script'}</span>
+                  </button>
+                </div>
+
+                <div className="relative">
+                  <pre className="p-4 bg-[#012f3d] text-[#faf8f2] rounded-2xl text-[11px] font-mono overflow-x-auto max-h-64 leading-relaxed border border-[#6ac8c1]/30">
+                    {supabaseSql}
+                  </pre>
+                </div>
+
+                <div className="bg-[#faf8f2] p-4 rounded-2xl border border-[#6ac8c1]/30 text-xs text-[#2d5560] space-y-1.5">
+                  <strong className="text-[#012f3d] block">Urdu / English Steps:</strong>
+                  <ol className="list-decimal pl-4 space-y-1 text-[11px]">
+                    <li>Supabase Dashboard (<strong>project ogfapocufuxzrvpckpfc</strong>) open karein.</li>
+                    <li>Left menu se <strong>"SQL Editor"</strong> par click karein aur <strong>"New Query"</strong> button dabayein.</li>
+                    <li>Upar diya gaya SQL script copy karke paste karein aur <strong>"Run"</strong> dabayein.</li>
+                    <li>Bas! Website ke product changes aur customer orders direct aapke Supabase database mein save hote rahenge.</li>
+                  </ol>
+                </div>
+              </div>
+
+              {/* Catalog Management Actions */}
+              <div className="pt-4 border-t border-[#6ac8c1]/20 flex flex-wrap items-center justify-between gap-3">
+                <button
+                  type="button"
+                  onClick={() => clearAllProducts()}
+                  className="px-4 py-2 border border-rose-200 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-xl text-xs font-semibold cursor-pointer transition"
+                >
+                  Clear All Products from Catalog
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => seedSampleCatalog()}
+                  className="px-4 py-2 bg-[#faf8f2] hover:bg-[#6ac8c1]/20 text-[#012f3d] border border-[#6ac8c1]/40 rounded-xl text-xs font-semibold cursor-pointer transition"
+                >
+                  Load 12 Sample Crochet Pieces
+                </button>
+              </div>
             </div>
           </div>
         )}
 
-        {/* TAB 3: STORE & EASYPAISA SETTINGS */}
+        {/* TAB 4: STORE & EASYPAISA SETTINGS */}
         {adminTab === 'settings' && (
           <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#6ac8c1]/30 shadow-sm max-w-2xl">
             <h3 className="font-serif text-2xl font-bold text-[#012f3d] mb-1">
@@ -932,7 +1250,7 @@ export const AdminPanel: React.FC = () => {
                   onClick={() => setDeleteTarget({ type: 'reset-catalog' })}
                   className="text-xs text-rose-600 hover:underline cursor-pointer"
                 >
-                  Reset Catalog to Default
+                  Reset Catalog to Empty State
                 </button>
                 <button
                   type="submit"

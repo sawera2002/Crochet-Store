@@ -3,6 +3,7 @@ import { Product, ProductCategory, NavigationTab } from '../../types';
 import { useStore } from '../../context/StoreContext';
 import { NewCollectionCarousel } from '../home/NewCollectionCarousel';
 import { getWhatsAppUrl, CROCHET_BENEFITS } from '../../data/contentData';
+import heroImage from '../../assets/images/hero_crochet_art_1790575187843.jpg';
 import {
   Sparkles,
   ShoppingBag,
@@ -12,7 +13,8 @@ import {
   ShieldCheck,
   ArrowRight,
   MapPin,
-  CheckCircle2
+  CheckCircle2,
+  Star
 } from 'lucide-react';
 
 interface HomePageProps {
@@ -58,57 +60,108 @@ export const HomePage: React.FC<HomePageProps> = ({
         <div className="absolute -bottom-16 -left-16 w-80 h-80 rounded-full bg-[#012f3d]/10 blur-3xl pointer-events-none" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-          <div className="max-w-3xl">
-            {/* Top Badge */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-[#6ac8c1]/40 text-[#012f3d] text-xs font-semibold uppercase tracking-wider mb-4 shadow-2xs">
-              <span className="w-2 h-2 rounded-full bg-[#6ac8c1] animate-pulse" />
-              <span>Zarsal • Karachi's Handmade Crochet Studio</span>
+          {/* 2-Column Responsive Layout: Left Content & Right Hero Image */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+            {/* Left Column: Heading, Bio, CTAs */}
+            <div className="lg:col-span-7">
+              {/* Top Badge */}
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-[#6ac8c1]/40 text-[#012f3d] text-xs font-semibold uppercase tracking-wider mb-4 shadow-2xs">
+                <span className="w-2 h-2 rounded-full bg-[#6ac8c1] animate-pulse" />
+                <span>Zarsal • Karachi's Handmade Crochet Studio</span>
+              </div>
+
+              {/* Main Headline */}
+              <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold text-[#012f3d] tracking-tight leading-[1.12]">
+                Artisan Crochet &amp; Wool, <br />
+                <span className="italic font-normal text-[#2d5560]">
+                  hand-knitted petal by petal in Karachi.
+                </span>
+              </h1>
+
+              <p className="mt-4 text-[#2d5560] text-sm sm:text-base leading-relaxed max-w-2xl">
+                Welcome to <strong>Zarsal</strong>. We create bespoke crochet bags, daisy bucket hats,
+                amigurumi keychains, floral wristlets, and lace handkerchiefs using 100% natural milk cotton.
+                Delivered directly across <strong>Karachi</strong> with <strong>Cash on Delivery (COD)</strong>,{' '}
+                <strong>EasyPaisa</strong>, and instant <strong>WhatsApp orders</strong>.
+              </p>
+
+              {/* CTAs */}
+              <div className="flex flex-wrap items-center gap-3.5 mt-7">
+                <button
+                  onClick={() => onNavigateToShop('all')}
+                  className="px-6 py-3 bg-[#012f3d] hover:bg-[#024357] text-[#faf8f2] rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 shadow-sm hover:shadow-md transition cursor-pointer active:scale-95"
+                >
+                  <ShoppingBag className="w-4 h-4 text-[#6ac8c1]" />
+                  <span>Explore Shop Catalog</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+
+                <button
+                  onClick={handleWhatsAppInquiry}
+                  className="px-5 py-3 bg-[#25D366] hover:bg-[#20b858] text-white rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 shadow-sm transition cursor-pointer active:scale-95"
+                >
+                  <MessageCircle className="w-4 h-4 fill-white" />
+                  <span>Order on WhatsApp</span>
+                </button>
+              </div>
+
+              {/* Karachi Delivery Scope Note */}
+              <div className="flex items-center gap-2 mt-5 text-xs font-semibold text-[#012f3d] bg-white/80 backdrop-blur-xs px-3.5 py-2 rounded-xl border border-[#6ac8c1]/30 w-fit">
+                <MapPin className="w-3.5 h-3.5 text-[#6ac8c1]" />
+                <span>Exclusive Karachi Delivery Only • Clifton, DHA, Gulshan, Johar, North Nazimabad &amp; all areas</span>
+              </div>
             </div>
 
-            {/* Main Headline */}
-            <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold text-[#012f3d] tracking-tight leading-[1.12]">
-              Artisan Crochet &amp; Wool, <br />
-              <span className="italic font-normal text-[#2d5560]">
-                hand-knitted petal by petal in Karachi.
-              </span>
-            </h1>
+            {/* Right Column: Hero Showcase Image */}
+            <div className="lg:col-span-5 relative mt-4 lg:mt-0">
+              <div className="relative group">
+                {/* Decorative border background accent */}
+                <div className="absolute -inset-2 rounded-[2.2rem] bg-gradient-to-tr from-[#6ac8c1]/40 via-[#faf8f2] to-[#012f3d]/20 blur-sm -z-10 group-hover:blur-md transition-all duration-300" />
 
-            <p className="mt-4 text-[#2d5560] text-sm sm:text-base leading-relaxed max-w-2xl">
-              Welcome to <strong>Zarsal</strong>. We create bespoke crochet bags, daisy bucket hats,
-              amigurumi keychains, floral wristlets, and lace handkerchiefs using 100% natural milk cotton.
-              Delivered directly across <strong>Karachi</strong> with <strong>Cash on Delivery (COD)</strong>,{' '}
-              <strong>EasyPaisa</strong>, and instant <strong>WhatsApp orders</strong>.
-            </p>
+                <div className="relative rounded-3xl overflow-hidden border border-[#6ac8c1]/40 shadow-xl bg-white">
+                  <img
+                    src={heroImage}
+                    alt="Zarsal Artisan Handmade Crochet Collection"
+                    referrerPolicy="no-referrer"
+                    className="w-full h-80 sm:h-96 lg:h-[430px] object-cover object-center transform group-hover:scale-103 transition-transform duration-700 ease-out"
+                  />
 
-            {/* CTAs */}
-            <div className="flex flex-wrap items-center gap-3.5 mt-7">
-              <button
-                onClick={() => onNavigateToShop('all')}
-                className="px-6 py-3 bg-[#012f3d] hover:bg-[#024357] text-[#faf8f2] rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 shadow-sm hover:shadow-md transition cursor-pointer active:scale-95"
-              >
-                <ShoppingBag className="w-4 h-4 text-[#6ac8c1]" />
-                <span>Explore Shop Catalog</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
+                  {/* Gradient shadow for text legibility */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#012f3d]/80 via-black/10 to-transparent pointer-events-none" />
 
-              <button
-                onClick={handleWhatsAppInquiry}
-                className="px-5 py-3 bg-[#25D366] hover:bg-[#20b858] text-white rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 shadow-sm transition cursor-pointer active:scale-95"
-              >
-                <MessageCircle className="w-4 h-4 fill-white" />
-                <span>Order on WhatsApp</span>
-              </button>
-            </div>
+                  {/* Top floating badge */}
+                  <div className="absolute top-4 right-4 bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-full border border-[#6ac8c1]/30 shadow-md flex items-center gap-1.5">
+                    <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
+                    <span className="text-xs font-bold text-[#012f3d]">100% Handcrafted</span>
+                  </div>
 
-            {/* Karachi Delivery Scope Note */}
-            <div className="flex items-center gap-2 mt-5 text-xs font-semibold text-[#012f3d] bg-white/80 backdrop-blur-xs px-3.5 py-2 rounded-xl border border-[#6ac8c1]/30 w-fit">
-              <MapPin className="w-3.5 h-3.5 text-[#6ac8c1]" />
-              <span>Exclusive Karachi Delivery Only • Clifton, DHA, Gulshan, Johar, North Nazimabad &amp; all areas</span>
+                  {/* Bottom Studio Card overlay */}
+                  <div className="absolute bottom-4 left-4 right-4 bg-white/95 backdrop-blur-md p-4 rounded-2xl border border-[#6ac8c1]/40 shadow-lg flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-11 h-11 rounded-xl bg-[#faf8f2] border border-[#6ac8c1]/40 flex items-center justify-center text-2xl shadow-2xs shrink-0">
+                        🧶
+                      </div>
+                      <div>
+                        <span className="font-serif font-bold text-sm text-[#012f3d] block leading-tight">
+                          Natural Milk Cotton &amp; Wool
+                        </span>
+                        <span className="text-[11px] text-[#2d5560] block mt-0.5">
+                          Totes, Daisy Hats, Charms &amp; Lace
+                        </span>
+                      </div>
+                    </div>
+                    <div className="text-right shrink-0 border-l border-[#6ac8c1]/30 pl-3">
+                      <span className="text-[10px] uppercase font-bold text-[#6ac8c1] block">Artisan Hub</span>
+                      <span className="text-xs font-bold text-[#012f3d]">Karachi Studio</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
           {/* Quick Category Jump Blocks */}
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mt-10">
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mt-12">
             {categories.map((cat) => (
               <button
                 key={cat.id}
@@ -175,7 +228,7 @@ export const HomePage: React.FC<HomePageProps> = ({
         </div>
       </section>
 
-      {/* NEW COLLECTION CAROUSEL (Requested: Just New Collection shown on Home in Carousel) */}
+      {/* NEW COLLECTION CAROUSEL */}
       <NewCollectionCarousel onOpenProductDetails={onOpenProductDetails} />
 
       {/* Benefits Preview Section */}
