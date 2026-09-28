@@ -9,21 +9,14 @@ import {
   Trash2,
   Edit,
   Search,
-  CreditCard,
   Phone,
   Eye,
-  Settings,
   Sparkles,
   Lock,
   LogOut,
   MapPin,
   MessageCircle,
-  Database,
   CheckCircle2,
-  AlertCircle,
-  RefreshCw,
-  Copy,
-  Check,
   User,
   KeyRound,
   EyeOff
@@ -38,11 +31,7 @@ export const AdminPanel: React.FC = () => {
     orders,
     products,
     settings,
-    supabaseStatus,
-    refreshDbData,
-    supabaseSql,
     seedSampleCatalog,
-    clearAllProducts,
     addProduct,
     updateProduct,
     deleteProduct,
@@ -55,11 +44,10 @@ export const AdminPanel: React.FC = () => {
     updateSettings,
     loginAdmin,
     logoutAdmin,
-    setActiveTab,
-    showToast
+    setActiveTab
   } = useStore();
 
-  const [adminTab, setAdminTab] = useState<'orders' | 'products' | 'database' | 'settings'>('orders');
+  const [adminTab, setAdminTab] = useState<'orders' | 'products' | 'settings'>('orders');
 
   // Login form state for dedicated /admin route
   const [loginUsername, setLoginUsername] = useState('');
@@ -83,8 +71,6 @@ export const AdminPanel: React.FC = () => {
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
-  const [copiedSql, setCopiedSql] = useState(false);
-  const [isRefreshingDb, setIsRefreshingDb] = useState(false);
 
   // Store Settings Form States
   const [epTitle, setEpTitle] = useState(settings.easyPaisaAccountTitle);
@@ -161,7 +147,7 @@ export const AdminPanel: React.FC = () => {
             </div>
             <h2 className="font-serif text-3xl font-bold text-[#012f3d]">Zarsal Admin Studio</h2>
             <p className="text-[#2d5560] text-xs sm:text-sm">
-              Restricted portal for managing crochet catalog, customer orders, Karachi addresses, and Supabase database.
+              Restricted portal for managing crochet catalog, customer orders, and Karachi deliveries.
             </p>
           </div>
 
@@ -345,20 +331,6 @@ export const AdminPanel: React.FC = () => {
     window.open(url, '_blank', 'noopener,noreferrer');
   };
 
-  const handleCopySql = () => {
-    navigator.clipboard.writeText(supabaseSql);
-    setCopiedSql(true);
-    showToast('Supabase SQL schema copied to clipboard!');
-    setTimeout(() => setCopiedSql(false), 3000);
-  };
-
-  const handleRefreshDb = async () => {
-    setIsRefreshingDb(true);
-    await refreshDbData();
-    setIsRefreshingDb(false);
-    showToast('Database connection checked');
-  };
-
   const getStatusBadge = (status: OrderStatus) => {
     switch (status) {
       case 'pending_payment':
@@ -385,12 +357,16 @@ export const AdminPanel: React.FC = () => {
             <div className="flex items-center gap-2 text-xs uppercase tracking-widest text-[#6ac8c1] font-bold mb-1">
               <Sparkles className="w-3.5 h-3.5" />
               <span>Zarsal Admin Control Studio • Karachi</span>
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-semibold border border-emerald-500/30">
+                <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                Supabase Connected
+              </span>
             </div>
             <h1 className="font-serif text-2xl sm:text-3xl font-bold text-white">
               Orders &amp; Crochet Inventory Manager
             </h1>
             <p className="text-[#faf8f2]/80 text-xs sm:text-sm mt-1 max-w-xl">
-              Connected to Supabase database. Manage catalog, customer delivery addresses in Karachi, verify EasyPaisa payments, and dispatch riders.
+              Live database connection active. Manage crochet products, customer delivery addresses in Karachi, verify EasyPaisa payments, and dispatch riders.
             </p>
           </div>
 
@@ -408,53 +384,6 @@ export const AdminPanel: React.FC = () => {
             >
               <LogOut className="w-4 h-4" />
               <span>Logout</span>
-            </button>
-          </div>
-        </div>
-
-        {/* Database Status Strip */}
-        <div className="bg-white rounded-2xl p-4 border border-[#6ac8c1]/30 shadow-2xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-xl bg-[#012f3d]/10 flex items-center justify-center text-[#012f3d] shrink-0">
-              <Database className="w-4 h-4 text-[#6ac8c1]" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2 font-bold text-[#012f3d]">
-                <span>Supabase: ogfapocufuxzrvpckpfc</span>
-                {supabaseStatus.connected ? (
-                  <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold text-[10px] flex items-center gap-1">
-                    <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                    Connected
-                  </span>
-                ) : (
-                  <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 font-bold text-[10px] flex items-center gap-1">
-                    <AlertCircle className="w-3 h-3 text-amber-600" />
-                    Pending Setup
-                  </span>
-                )}
-              </div>
-              <span className="text-[#2d5560] text-[11px]">
-                {supabaseStatus.productsTableExists && supabaseStatus.ordersTableExists
-                  ? 'Live database sync active for catalog and orders.'
-                  : 'Ready to connect tables. Use the "Supabase Database" tab to view setup SQL.'}
-              </span>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setAdminTab('database')}
-              className="px-3 py-1.5 bg-[#faf8f2] hover:bg-[#6ac8c1]/20 text-[#012f3d] border border-[#6ac8c1]/30 rounded-xl text-xs font-semibold transition cursor-pointer"
-            >
-              Database Details
-            </button>
-            <button
-              onClick={handleRefreshDb}
-              disabled={isRefreshingDb}
-              className="p-1.5 text-[#012f3d] hover:bg-[#faf8f2] border border-[#6ac8c1]/30 rounded-xl transition cursor-pointer disabled:opacity-50"
-              title="Refresh database status"
-            >
-              <RefreshCw className={`w-4 h-4 ${isRefreshingDb ? 'animate-spin' : ''}`} />
             </button>
           </div>
         </div>
@@ -496,7 +425,7 @@ export const AdminPanel: React.FC = () => {
           </div>
         </div>
 
-        {/* Navigation Sub-Tabs */}
+        {/* Navigation Sub-Tabs (Cleaned up: Orders, Products, Settings) */}
         <div className="flex border-b border-[#6ac8c1]/30 gap-6 overflow-x-auto scrollbar-none">
           <button
             onClick={() => setAdminTab('orders')}
@@ -523,18 +452,6 @@ export const AdminPanel: React.FC = () => {
             }`}
           >
             <span>Manage Crochet Catalog ({products.length})</span>
-          </button>
-
-          <button
-            onClick={() => setAdminTab('database')}
-            className={`pb-3 text-sm font-serif font-bold transition-all relative cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
-              adminTab === 'database'
-                ? 'text-[#012f3d] border-b-2 border-[#012f3d]'
-                : 'text-[#4a707a] hover:text-[#012f3d]'
-            }`}
-          >
-            <Database className="w-3.5 h-3.5 text-[#6ac8c1]" />
-            <span>Supabase Database</span>
           </button>
 
           <button
@@ -1013,151 +930,7 @@ export const AdminPanel: React.FC = () => {
           </div>
         )}
 
-        {/* TAB 3: SUPABASE DATABASE CONNECTION & SCHEMA */}
-        {adminTab === 'database' && (
-          <div className="space-y-6">
-            <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#6ac8c1]/30 shadow-sm space-y-6">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-[#6ac8c1]/20">
-                <div>
-                  <span className="text-xs uppercase font-bold tracking-wider text-[#6ac8c1] block">
-                    PostgreSQL / Supabase Realtime Storage
-                  </span>
-                  <h3 className="font-serif text-2xl font-bold text-[#012f3d] mt-0.5">
-                    Supabase Project Connection
-                  </h3>
-                  <p className="text-xs text-[#2d5560] mt-1 max-w-xl">
-                    Live connection to your Supabase project. Products and customer orders persist permanently across sessions.
-                  </p>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={handleRefreshDb}
-                    disabled={isRefreshingDb}
-                    className="px-4 py-2 bg-[#faf8f2] hover:bg-[#6ac8c1]/20 text-[#012f3d] border border-[#6ac8c1]/30 rounded-xl text-xs font-bold flex items-center gap-2 transition cursor-pointer"
-                  >
-                    <RefreshCw className={`w-3.5 h-3.5 ${isRefreshingDb ? 'animate-spin' : ''}`} />
-                    <span>Check Connection</span>
-                  </button>
-                </div>
-              </div>
-
-              {/* Status Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="bg-[#faf8f2] p-4 rounded-2xl border border-[#6ac8c1]/30">
-                  <span className="text-[11px] font-bold text-[#4a707a] uppercase block">
-                    Supabase Project URL
-                  </span>
-                  <span className="text-xs font-mono font-bold text-[#012f3d] block mt-1 break-all">
-                    https://ogfapocufuxzrvpckpfc.supabase.co
-                  </span>
-                  <div className="flex items-center gap-1.5 mt-2 text-[11px] text-emerald-700 font-semibold">
-                    <CheckCircle2 className="w-3.5 h-3.5" />
-                    <span>Endpoint Reachable</span>
-                  </div>
-                </div>
-
-                <div className="bg-[#faf8f2] p-4 rounded-2xl border border-[#6ac8c1]/30">
-                  <span className="text-[11px] font-bold text-[#4a707a] uppercase block">
-                    Products Table (`public.products`)
-                  </span>
-                  <span className="text-sm font-bold text-[#012f3d] block mt-1">
-                    {supabaseStatus.productsTableExists ? (
-                      <span className="text-emerald-700 flex items-center gap-1">
-                        <CheckCircle2 className="w-4 h-4" /> Ready ({products.length} items)
-                      </span>
-                    ) : (
-                      <span className="text-amber-700 flex items-center gap-1">
-                        <AlertCircle className="w-4 h-4" /> Run SQL Setup Below
-                      </span>
-                    )}
-                  </span>
-                  <span className="text-[11px] text-[#4a707a] block mt-1">
-                    Stores name, prices, yarn, stock &amp; images.
-                  </span>
-                </div>
-
-                <div className="bg-[#faf8f2] p-4 rounded-2xl border border-[#6ac8c1]/30">
-                  <span className="text-[11px] font-bold text-[#4a707a] uppercase block">
-                    Orders Table (`public.orders`)
-                  </span>
-                  <span className="text-sm font-bold text-[#012f3d] block mt-1">
-                    {supabaseStatus.ordersTableExists ? (
-                      <span className="text-emerald-700 flex items-center gap-1">
-                        <CheckCircle2 className="w-4 h-4" /> Ready ({orders.length} orders)
-                      </span>
-                    ) : (
-                      <span className="text-amber-700 flex items-center gap-1">
-                        <AlertCircle className="w-4 h-4" /> Run SQL Setup Below
-                      </span>
-                    )}
-                  </span>
-                  <span className="text-[11px] text-[#4a707a] block mt-1">
-                    Stores customer addresses, items &amp; EasyPaisa TRX.
-                  </span>
-                </div>
-              </div>
-
-              {/* Instructions and SQL Box */}
-              <div className="space-y-3 pt-2">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h4 className="font-bold text-sm text-[#012f3d]">
-                      Supabase SQL Schema Script
-                    </h4>
-                    <p className="text-xs text-[#2d5560]">
-                      To initialize or verify tables in your Supabase project, copy this SQL and run it in the Supabase SQL Editor.
-                    </p>
-                  </div>
-                  <button
-                    onClick={handleCopySql}
-                    className="px-3.5 py-2 bg-[#012f3d] hover:bg-[#024357] text-[#faf8f2] rounded-xl text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer shadow-2xs"
-                  >
-                    {copiedSql ? <Check className="w-3.5 h-3.5 text-[#6ac8c1]" /> : <Copy className="w-3.5 h-3.5" />}
-                    <span>{copiedSql ? 'Copied!' : 'Copy SQL Script'}</span>
-                  </button>
-                </div>
-
-                <div className="relative">
-                  <pre className="p-4 bg-[#012f3d] text-[#faf8f2] rounded-2xl text-[11px] font-mono overflow-x-auto max-h-64 leading-relaxed border border-[#6ac8c1]/30">
-                    {supabaseSql}
-                  </pre>
-                </div>
-
-                <div className="bg-[#faf8f2] p-4 rounded-2xl border border-[#6ac8c1]/30 text-xs text-[#2d5560] space-y-1.5">
-                  <strong className="text-[#012f3d] block">Urdu / English Steps:</strong>
-                  <ol className="list-decimal pl-4 space-y-1 text-[11px]">
-                    <li>Supabase Dashboard (<strong>project ogfapocufuxzrvpckpfc</strong>) open karein.</li>
-                    <li>Left menu se <strong>"SQL Editor"</strong> par click karein aur <strong>"New Query"</strong> button dabayein.</li>
-                    <li>Upar diya gaya SQL script copy karke paste karein aur <strong>"Run"</strong> dabayein.</li>
-                    <li>Bas! Website ke product changes aur customer orders direct aapke Supabase database mein save hote rahenge.</li>
-                  </ol>
-                </div>
-              </div>
-
-              {/* Catalog Management Actions */}
-              <div className="pt-4 border-t border-[#6ac8c1]/20 flex flex-wrap items-center justify-between gap-3">
-                <button
-                  type="button"
-                  onClick={() => clearAllProducts()}
-                  className="px-4 py-2 border border-rose-200 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-xl text-xs font-semibold cursor-pointer transition"
-                >
-                  Clear All Products from Catalog
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => seedSampleCatalog()}
-                  className="px-4 py-2 bg-[#faf8f2] hover:bg-[#6ac8c1]/20 text-[#012f3d] border border-[#6ac8c1]/40 rounded-xl text-xs font-semibold cursor-pointer transition"
-                >
-                  Load 12 Sample Crochet Pieces
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* TAB 4: STORE & EASYPAISA SETTINGS */}
+        {/* TAB 3: STORE & EASYPAISA SETTINGS */}
         {adminTab === 'settings' && (
           <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#6ac8c1]/30 shadow-sm max-w-2xl">
             <h3 className="font-serif text-2xl font-bold text-[#012f3d] mb-1">
