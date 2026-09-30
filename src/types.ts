@@ -1,11 +1,11 @@
-export type ProductCategory = 'all' | 'bags' | 'hats' | 'bracelets' | 'keychains' | 'handkerchiefs';
+export type ProductCategory = 'all' | 'bags' | 'bracelets' | 'keychains' | 'handkerchiefs';
 
 export type NavigationTab = 'home' | 'about' | 'shop' | 'blogs' | 'contact' | 'admin';
 
 export interface Product {
   id: string;
   name: string;
-  category: 'bags' | 'hats' | 'bracelets' | 'keychains' | 'handkerchiefs';
+  category: 'bags' | 'bracelets' | 'keychains' | 'handkerchiefs';
   price: number;
   originalPrice?: number;
   image: string;

@@ -32,7 +32,6 @@ export const ShopPage: React.FC<ShopPageProps> = ({
     { id: 'all', label: 'All Handmade', icon: '✨' },
     { id: 'bags', label: 'Bags & Totes', icon: '👜' },
     { id: 'keychains', label: 'Keychains & Charms', icon: '🍓' },
-    { id: 'hats', label: 'Daisy Hats & Beanies', icon: '👒' },
     { id: 'bracelets', label: 'Friendship Bracelets', icon: '🌸' },
     { id: 'handkerchiefs', label: 'Lace Handkerchiefs', icon: '🪡' }
   ];
@@ -74,7 +73,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({
               Zarsal Artisan Shop
             </h1>
             <p className="text-[#2d5560] text-xs sm:text-sm mt-1.5 max-w-xl">
-              Browse our complete catalog of hand-knitted bags, keychains, bucket hats, bracelets, and handkerchiefs.
+              Browse our complete catalog of hand-knitted bags, keychains, bracelets, and handkerchiefs.
               Direct delivery across Karachi with Cash on Delivery &amp; EasyPaisa.
             </p>
           </div>

@@ -79,7 +79,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose, onOpenC
               </div>
               <p className="font-serif text-lg text-[#012f3d] font-bold">Your basket is empty</p>
               <p className="text-xs text-[#2d5560] max-w-xs mt-1">
-                Explore our handmade crochet bags, bucket hats, keychains, bracelets, and handkerchiefs!
+                Explore our handmade crochet bags, keychains, bracelets, and handkerchiefs!
               </p>
               <button
                 onClick={onClose}

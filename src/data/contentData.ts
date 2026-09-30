@@ -53,7 +53,7 @@ export const CROCHET_BENEFITS = [
     id: 'custom-unique',
     title: '100% Bespoke & Unique',
     urduTitle: 'Bespoke Handmade Crochet',
-    desc: 'No two crochet pieces are ever carbon copies. From petal placement on daisy hats to color blending in granny squares, your piece is exclusively yours.',
+    desc: 'No two crochet pieces are ever carbon copies. From petal placement on floral charms to color blending in granny squares, your piece is exclusively yours.',
     icon: '🎀'
   }
 ];
@@ -73,8 +73,8 @@ export const CUSTOMER_REVIEWS: Review[] = [
     customerName: 'Hafsa Naveed',
     location: 'Gulshan-e-Iqbal Block 13, Karachi',
     rating: 5,
-    comment: 'The strawberry keychain and daisy bucket hat are so aesthetic! My friends at IBA asked me where I bought it from. Ordered via WhatsApp and paid Cash on Delivery easily.',
-    purchasedItem: 'Pastel Daisy Bucket Hat & Strawberry Charm',
+    comment: 'The strawberry keychain and floral charm pouch are so aesthetic! My friends at IBA asked me where I bought it from. Ordered via WhatsApp and paid Cash on Delivery easily.',
+    purchasedItem: 'Daisy Crossbody Pouch & Strawberry Charm',
     date: '1 week ago'
   },
   {
@@ -110,7 +110,7 @@ export const BLOG_POSTS: BlogPost[] = [
   {
     id: 'blog-care-guide',
     title: 'How to Wash & Care for Handmade Crochet Pieces',
-    subtitle: 'Essential laundry tips so your milk cotton bags and bucket hats never shrink or fray.',
+    subtitle: 'Essential laundry tips so your milk cotton bags and accessories never shrink or fray.',
     category: 'Care & Longevity',
     readTime: '3 min read',
     date: 'September 18, 2026',
@@ -121,7 +121,7 @@ export const BLOG_POSTS: BlogPost[] = [
       '2. Use a mild baby shampoo or gentle wool liquid detergent. Never use harsh bleaches or chlorine.',
       '3. Gently submerge and squeeze the soapy water through the stitches. Do not wring or twist violently, as this pulls the yarn out of symmetry.',
       '4. Rinse in clean cool water, then roll in a clean cotton towel to absorb excess moisture.',
-      '5. Dry flat on a clean dry towel in the shade. Never hang a wet crochet bag or hat on a hook, as the weight of water will stretch the loops.'
+      '5. Dry flat on a clean dry towel in the shade. Never hang a wet crochet bag or accessory on a hook, as the weight of water will stretch the loops.'
     ]
   },
   {
@@ -131,12 +131,12 @@ export const BLOG_POSTS: BlogPost[] = [
     category: 'Material Guide',
     readTime: '4 min read',
     date: 'September 14, 2026',
-    image: 'https://images.unsplash.com/photo-1521369909029-2afed882baee?auto=format&fit=crop&w=900&q=80',
+    image: 'https://images.unsplash.com/photo-1611591475825-792942dd56e1?auto=format&fit=crop&w=900&q=80',
     content: [
       'Karachi’s humid coastal climate demands fibers that absorb moisture while allowing air to circulate freely around your skin.',
       'Standard acrylic and nylon yarns found in factory fast fashion trap body heat, cause sweat buildup, and irritate sensitive skin.',
       'At Zarsal, we strictly select 5-ply combed milk cotton yarn. The cotton provides natural tensile strength and airflow, while natural milk protein fiber adds an ultra-smooth sheen that feels like silk.',
-      'Whether you are wearing our scalloped daisy bucket hat under the Clifton seaside sun or carrying a granny square tote to university, your accessories remain fresh and comfortable all day.'
+      'Whether you are carrying our handcrafted floral pouch under the Clifton seaside sun or carrying a granny square tote to university, your accessories remain fresh and comfortable all day.'
     ]
   },
   {
@@ -155,7 +155,7 @@ export const BLOG_POSTS: BlogPost[] = [
   }
 ];
 
-export const getWhatsAppUrl = (phone = '0324336202', message = 'Hello Zarsal! I would like to inquire about your handmade crochet pieces in Karachi.') => {
+export const getWhatsAppUrl = (phone = '03243362028', message = 'Hello Zarsal! I would like to inquire about your handmade crochet pieces in Karachi.') => {
   let cleanPhone = phone.replace(/[^0-9]/g, '');
   if (cleanPhone.startsWith('0')) {
     cleanPhone = '92' + cleanPhone.slice(1);

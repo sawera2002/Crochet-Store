@@ -73,12 +73,12 @@ export const AdminPanel: React.FC = () => {
   const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
 
   // Store Settings Form States
-  const [epTitle, setEpTitle] = useState(settings.easyPaisaAccountTitle);
-  const [epNumber, setEpNumber] = useState(settings.easyPaisaAccountNumber || '0324336202');
+  const [epTitle, setEpTitle] = useState(settings.easyPaisaAccountTitle || 'Muhammad Faisal Chohan');
+  const [epNumber, setEpNumber] = useState(settings.easyPaisaAccountNumber || '03121800404');
   const [freeThreshold, setFreeThreshold] = useState(settings.freeShippingThreshold);
   const [stdShipping, setStdShipping] = useState(settings.standardShippingFee);
-  const [waNumber, setWaNumber] = useState(settings.whatsappNumber || '0324336202');
-  const [phoneSupport, setPhoneSupport] = useState(settings.contactPhone || '+92 324 336202');
+  const [waNumber, setWaNumber] = useState(settings.whatsappNumber || '03243362028');
+  const [phoneSupport, setPhoneSupport] = useState(settings.contactPhone || '+92 324 3362028');
 
   // Filtered Orders
   const filteredOrders = useMemo(() => {
@@ -776,7 +776,6 @@ export const AdminPanel: React.FC = () => {
                 >
                   <option value="all">All Categories</option>
                   <option value="bags">Bags</option>
-                  <option value="hats">Hats</option>
                   <option value="bracelets">Bracelets</option>
                   <option value="keychains">Keychains</option>
                   <option value="handkerchiefs">Handkerchiefs</option>

@@ -18,7 +18,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
   initialProduct
 }) => {
   const [name, setName] = useState('');
-  const [category, setCategory] = useState<'bags' | 'hats' | 'bracelets' | 'keychains' | 'handkerchiefs'>('bags');
+  const [category, setCategory] = useState<'bags' | 'bracelets' | 'keychains' | 'handkerchiefs'>('bags');
   const [price, setPrice] = useState<number | ''>('');
   const [originalPrice, setOriginalPrice] = useState<number | ''>('');
   const [stock, setStock] = useState<number | ''>(10);
@@ -85,11 +85,6 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
       'https://images.unsplash.com/photo-1590874103328-eac38a683ce7?auto=format&fit=crop&w=900&q=80',
       'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=900&q=80',
       'https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=900&q=80'
-    ],
-    hats: [
-      'https://images.unsplash.com/photo-1521369909029-2afed882baee?auto=format&fit=crop&w=900&q=80',
-      'https://images.unsplash.com/photo-1576871337632-b9aef4c17ab9?auto=format&fit=crop&w=900&q=80',
-      'https://images.unsplash.com/photo-1582791694770-cbdc9dda338f?auto=format&fit=crop&w=900&q=80'
     ],
     bracelets: [
       'https://images.unsplash.com/photo-1611591475825-792942dd56e1?auto=format&fit=crop&w=900&q=80',
@@ -199,7 +194,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="e.g. Pastel Daisy Scalloped Bucket Hat"
+                placeholder="e.g. Retro Blossom Granny Square Tote Bag"
                 className={`w-full px-3 py-2 text-xs sm:text-sm bg-[#faf8f2] border rounded-xl focus:ring-2 focus:ring-[#6ac8c1] text-[#012f3d] ${
                   errors.name ? 'border-rose-400' : 'border-[#6ac8c1]/30'
                 }`}
@@ -218,7 +213,6 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
                 className="w-full px-3 py-2 text-xs sm:text-sm bg-[#faf8f2] border border-[#6ac8c1]/30 rounded-xl focus:ring-2 focus:ring-[#6ac8c1] text-[#012f3d] cursor-pointer"
               >
                 <option value="bags">Bags &amp; Totes</option>
-                <option value="hats">Hats &amp; Beanies</option>
                 <option value="bracelets">Bracelets</option>
                 <option value="keychains">Keychains &amp; Charms</option>
                 <option value="handkerchiefs">Handkerchiefs</option>

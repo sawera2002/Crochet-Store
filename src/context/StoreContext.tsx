@@ -76,12 +76,12 @@ interface StoreContextType {
 const DEFAULT_SETTINGS: StoreSettings = {
   storeName: 'Zarsal',
   tagline: 'Handmade Crochet Art | Karachi Studio',
-  easyPaisaAccountTitle: 'Zarsal Studio (Sawera C.)',
-  easyPaisaAccountNumber: '0324336202',
+  easyPaisaAccountTitle: 'Muhammad Faisal Chohan',
+  easyPaisaAccountNumber: '03121800404',
   freeShippingThreshold: 2500,
   standardShippingFee: 180,
-  contactPhone: '+92 324 336202',
-  whatsappNumber: '0324336202',
+  contactPhone: '+92 324 3362028',
+  whatsappNumber: '03243362028',
   contactEmail: 'contact@zarsalcrochet.pk',
   cityServed: 'Karachi Only'
 };
@@ -89,13 +89,15 @@ const DEFAULT_SETTINGS: StoreSettings = {
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
 
 export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Purely dynamic / admin-managed products: starts empty or from localStorage
+  // Purely dynamic / admin-managed products: starts empty or from localStorage (hats filtered out)
   const [products, setProducts] = useState<Product[]>(() => {
     try {
       const saved = localStorage.getItem('zarsal_admin_products');
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) return parsed;
+        if (Array.isArray(parsed)) {
+          return parsed.filter((p: any) => p.category !== 'hats');
+        }
       }
     } catch {
       // ignore
@@ -121,7 +123,12 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [cart, setCart] = useState<CartItem[]>(() => {
     try {
       const saved = localStorage.getItem('zarsal_cart');
-      if (saved) return JSON.parse(saved);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          return parsed.filter((c: any) => c.product?.category !== 'hats');
+        }
+      }
     } catch {
       // fallback
     }
@@ -134,15 +141,10 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       const saved = localStorage.getItem('zarsal_settings');
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (parsed.whatsappNumber === '03047891234' || !parsed.whatsappNumber) {
-          parsed.whatsappNumber = '0324336202';
-        }
-        if (parsed.contactPhone === '+92 304 7891234' || !parsed.contactPhone) {
-          parsed.contactPhone = '+92 324 336202';
-        }
-        if (parsed.easyPaisaAccountNumber === '0304-7891234') {
-          parsed.easyPaisaAccountNumber = '0324336202';
-        }
+        parsed.whatsappNumber = '03243362028';
+        parsed.contactPhone = '+92 324 3362028';
+        parsed.easyPaisaAccountNumber = '03121800404';
+        parsed.easyPaisaAccountTitle = 'Muhammad Faisal Chohan';
         return { ...DEFAULT_SETTINGS, ...parsed };
       }
     } catch {
@@ -288,7 +290,10 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       if (health.productsTableExists) {
         const prodResult = await fetchProductsFromDb();
         if (prodResult.products !== null) {
-          setProducts(prodResult.products);
+          const validProducts = prodResult.products.filter(
+            (p) => (p.category as string) !== 'hats'
+          );
+          setProducts(validProducts);
         }
       }
 

@@ -41,7 +41,7 @@ export const AboutPage: React.FC = () => {
           <p className="text-[#2d5560] text-sm sm:text-base leading-relaxed">
             Founded with a deep love for traditional artisanal <strong>crochet</strong> handwork,
             <strong> Zarsal</strong> is a homegrown artisan studio based in Karachi. We blend timeless crochet stitches
-            with modern aesthetics to create heirloom bags, daisy bucket hats, and floral accessories that celebrate slow, conscious fashion.
+            with modern aesthetics to create heirloom bags, floral accessories, wristlets, and keepsake charms that celebrate slow, conscious fashion.
           </p>
         </section>
 

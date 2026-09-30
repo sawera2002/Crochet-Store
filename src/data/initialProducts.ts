@@ -56,61 +56,6 @@ export const INITIAL_PRODUCTS: Product[] = [
     craftTimeHours: 7
   },
 
-  // --- HATS ---
-  {
-    id: 'prod-hat-1',
-    name: 'Pastel Daisy Scalloped Brim Bucket Hat',
-    category: 'hats',
-    price: 1850,
-    originalPrice: 2100,
-    image: 'https://images.unsplash.com/photo-1521369909029-2afed882baee?auto=format&fit=crop&w=900&q=80',
-    description: 'A summer wardrobe staple hand-crocheted with breathable milk cotton. Adorned with delicate daisy motifs around the crown and an undulating wavy scalloped brim.',
-    yarnType: '100% Breathable Milk Cotton',
-    dimensions: 'Circumference 56-58cm (Gentle Stretch)',
-    colors: ['Cream & Sage', 'Lavender Haze', 'Sunlit Ochre'],
-    stock: 10,
-    rating: 4.9,
-    reviewsCount: 42,
-    isFeatured: true,
-    isNewCollection: true,
-    craftTimeHours: 6
-  },
-  {
-    id: 'prod-hat-2',
-    name: 'Cozy Waffle Knit Artisan Beanie',
-    category: 'hats',
-    price: 1500,
-    image: 'https://images.unsplash.com/photo-1576871337632-b9aef4c17ab9?auto=format&fit=crop&w=900&q=80',
-    description: 'Ultra-plush textured waffle stitch beanie with an adjustable folded ribbed brim. Keeps you comfortably warm while remaining breathable and gentle on hair.',
-    yarnType: 'Merino Wool & Cashmere Cotton Blend',
-    dimensions: 'Universal Adult Fit (Elasticated)',
-    colors: ['Warm Almond', 'Cloud Gray', 'Dusty Rose'],
-    stock: 14,
-    rating: 4.8,
-    reviewsCount: 31,
-    isFeatured: false,
-    isNewCollection: false,
-    craftTimeHours: 5
-  },
-  {
-    id: 'prod-hat-3',
-    name: 'French Riviera Raffia Weave Sun Hat',
-    category: 'hats',
-    price: 2600,
-    originalPrice: 2900,
-    image: 'https://images.unsplash.com/photo-1582791694770-cbdc9dda338f?auto=format&fit=crop&w=900&q=80',
-    description: 'Handwoven natural cellulose raffia wide brim sun hat. Blocks harsh UV rays with graceful vintage charm. Features an inner adjustable grosgrain ribbon.',
-    yarnType: 'Natural Japanese Eco-Raffia Yarn',
-    dimensions: 'Brim width 9cm, Crown depth 11cm',
-    colors: ['Natural Straw', 'Golden Honey'],
-    stock: 6,
-    rating: 4.9,
-    reviewsCount: 17,
-    isFeatured: true,
-    isNewCollection: true,
-    craftTimeHours: 11
-  },
-
   // --- BRACELETS ---
   {
     id: 'prod-brac-1',

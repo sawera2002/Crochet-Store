@@ -18,7 +18,6 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
     desc: string;
   }[] = [
     { id: 'bags', name: 'Bags', icon: '👜', desc: 'Granny Square & Totes' },
-    { id: 'hats', name: 'Hats', icon: '👒', desc: 'Daisy Bucket Hats' },
     { id: 'bracelets', name: 'Bracelets', icon: '🌸', desc: 'Handwoven Floral Bands' },
     { id: 'keychains', name: 'Keychains', icon: '🍓', desc: 'Amigurumi Charms' },
     { id: 'handkerchiefs', name: 'Handkerchiefs', icon: '🪡', desc: 'Vintage Lace Edging' }
@@ -45,13 +44,13 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
           </h1>
 
           <p className="mt-3.5 text-stone-600 text-sm sm:text-base leading-relaxed max-w-2xl">
-            Explore our boutique collection of lovingly hand-knitted bags, daisy bucket hats,
+            Explore our boutique collection of lovingly hand-knitted bags,
             flower bracelets, amigurumi keychains, and heirloom lace handkerchiefs.
             Easy checkout with <strong>EasyPaisa</strong> &amp; <strong>Cash on Delivery</strong>.
           </p>
 
           {/* Quick Category Selectors */}
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5 mt-8">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mt-8">
             {categoryHighlights.map((cat) => {
               const isSelected = selectedCategory === cat.id;
               return (

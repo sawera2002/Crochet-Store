@@ -38,7 +38,6 @@ export const HomePage: React.FC<HomePageProps> = ({
   }[] = [
     { id: 'bags', name: 'Bags & Totes', icon: '👜', desc: 'Granny Square & Shoulder Bags' },
     { id: 'keychains', name: 'Keychains & Charms', icon: '🍓', desc: 'Strawberry & Tulip Amigurumi' },
-    { id: 'hats', name: 'Hats & Beanies', icon: '👒', desc: 'Daisy Bucket Hats & Knit Caps' },
     { id: 'bracelets', name: 'Flora Bracelets', icon: '🌸', desc: 'Handwoven Friendship Bands' },
     { id: 'handkerchiefs', name: 'Lace Handkerchiefs', icon: '🪡', desc: 'Heirloom Crochet Edging' }
   ];
@@ -79,7 +78,7 @@ export const HomePage: React.FC<HomePageProps> = ({
               </h1>
 
               <p className="mt-4 text-[#2d5560] text-sm sm:text-base leading-relaxed max-w-2xl">
-                Welcome to <strong>Zarsal</strong>. We create bespoke crochet bags, daisy bucket hats,
+                Welcome to <strong>Zarsal</strong>. We create bespoke crochet bags,
                 amigurumi keychains, floral wristlets, and lace handkerchiefs using 100% natural milk cotton.
                 Delivered directly across <strong>Karachi</strong> with <strong>Cash on Delivery (COD)</strong>,{' '}
                 <strong>EasyPaisa</strong>, and instant <strong>WhatsApp orders</strong>.
@@ -146,7 +145,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                           Natural Milk Cotton &amp; Wool
                         </span>
                         <span className="text-[11px] text-[#2d5560] block mt-0.5">
-                          Totes, Daisy Hats, Charms &amp; Lace
+                          Totes, Charms, Wristlets &amp; Lace
                         </span>
                       </div>
                     </div>
@@ -161,7 +160,7 @@ export const HomePage: React.FC<HomePageProps> = ({
           </div>
 
           {/* Quick Category Jump Blocks */}
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mt-12">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-12">
             {categories.map((cat) => (
               <button
                 key={cat.id}

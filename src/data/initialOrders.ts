@@ -63,13 +63,13 @@ export const INITIAL_ORDERS: Order[] = [
     },
     items: [
       {
-        productId: 'prod-hat-1',
-        name: 'Pastel Daisy Scalloped Brim Bucket Hat',
-        category: 'hats',
-        price: 1850,
+        productId: 'prod-bag-1',
+        name: 'Retro Blossom Granny Square Tote Bag',
+        category: 'bags',
+        price: 3200,
         quantity: 1,
-        image: 'https://images.unsplash.com/photo-1521369909029-2afed882baee?auto=format&fit=crop&w=900&q=80',
-        yarnType: '100% Breathable Milk Cotton'
+        image: 'https://images.unsplash.com/photo-1590874103328-eac38a683ce7?auto=format&fit=crop&w=900&q=80',
+        yarnType: '100% Combed Milk Cotton'
       },
       {
         productId: 'prod-brac-1',

@@ -44,7 +44,7 @@ export const Footer: React.FC<FooterProps> = ({ onSelectCategory }) => {
             </div>
             <p className="text-[#2d5560] leading-relaxed text-xs">
               Every loop woven with patient hands. Zarsal is Karachi's dedicated handmade crochet
-              studio crafting timeless bags, hats, bracelets, keychains, and heirloom handkerchiefs.
+              studio crafting timeless bags, bracelets, keychains, and heirloom handkerchiefs.
             </p>
             <div className="flex items-center gap-1.5 text-[11px] text-[#012f3d] font-semibold pt-1">
               <span>Handmade with love in Karachi, Pakistan</span>
